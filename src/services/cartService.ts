@@ -5,7 +5,7 @@ interface ICreatCartForUser {
 }
 
 const creatCartForUser = async ({ userId }: ICreatCartForUser) => {
-  const cart = await cartModel.create({ userId });
+  const cart = await cartModel.create({ userId ,totalAmount:0});
   await cart.save();
   return cart;
 };
