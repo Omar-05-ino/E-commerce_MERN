@@ -1,5 +1,5 @@
 import express from "express";
-import { addItemToCart, getActiveCartForUser } from "../services/cartService";
+import { addItemToCart, getActiveCartForUser, updateItemInCart } from "../services/cartService";
 import valaidataJwt from "../middlewares/validateJWT";
 import { extendedRequest } from "../types/extendedRequest";
 
@@ -18,5 +18,11 @@ router.post("/items", valaidataJwt, async (req: extendedRequest, res) => {
   res.status(response.status).send(response.data);
 });
 
+router.put("/items", valaidataJwt, async (req: extendedRequest, res) => {
+  const userId = req.user._id;
+  const { productId, quantity } = req.body;
+  const response = await updateItemInCart({ userId, productId, quantity });
+  res.status(response.status).send(response.data);
+});
+
 export default router;
-     
