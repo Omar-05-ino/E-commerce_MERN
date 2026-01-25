@@ -18,7 +18,7 @@ const valaidataJwt = (
     return res.status(403).send({ data: "Unauthorized: Invalid token" });
   }
 
-  jwt.verify(token, "8b18e2a1d7f8a0b83d7265d7", async (err, payload) => {
+  jwt.verify(token, process.env.JWT_SECRET || "", async (err, payload) => {
     if (err) {
       return res.status(403).send({ data: "Unauthorized: Invalid token" });
     }

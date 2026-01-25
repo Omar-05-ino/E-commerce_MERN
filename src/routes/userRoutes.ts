@@ -4,15 +4,23 @@ import { login, register } from "../services/userService";
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
-  const reqdata = req.body;
-  const { status, data } = await register(reqdata);
-  res.status(status).send(data);
+  try {
+    const reqdata = req.body;
+    const { status, data } = await register(reqdata);
+    res.status(status).send(data);
+  } catch (error) {
+    res.status(500).send({ data: "Internal Server Error" });
+  }
 });
 
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const { status, data } = await login({ email, password });
-  res.status(status).send(data);
+  try {
+    const reqdata = req.body;
+    const { status, data } = await login(reqdata);
+    res.status(status).send(data);
+  } catch (error) {
+    res.status(500).send({ data: "Internal Server Error" });
+  }
 });
 
 export default router;

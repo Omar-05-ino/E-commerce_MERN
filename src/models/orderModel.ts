@@ -23,11 +23,10 @@ const OrderItemSchema = new Schema<IOrderItem>({
 });
 
 const OrderSchema = new Schema<IOrder>({
-    orderItems: [OrderItemSchema],
-    totalAmount: { type: Number, required: true },
-    address: { type: String, required: true },
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true }
-}) 
+  orderItems: [OrderItemSchema],
+  totalAmount: { type: Number, required: true },
+  address: { type: String, required: true },
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+});
 
 export const orderModel = mongoose.model<IOrder>("Order", OrderSchema);
-

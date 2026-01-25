@@ -1,5 +1,5 @@
 import UserModel from "../models/userModel";
-import bcryot from "bcrypt";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 interface RegisterParams {
@@ -15,30 +15,34 @@ export const register = async ({
   email,
   password,
 }: RegisterParams) => {
-  const findedUser = await UserModel.findOne({ email });
+  try {
+    const findedUser = await UserModel.findOne({ email });
 
-  if (findedUser) return { data: "User already exists", status: 400 };
+    if (findedUser) return { data: "User already exists", status: 400 };
 
-  const hashedPassword = await bcryot.hash(password, 10);
-  const newUser = new UserModel({
-    firstName,
-    lastName,
-    email,
-    password: hashedPassword,
-  });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new UserModel({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+    });
 
-  await newUser.save();
-  
-  const token = generateJwt({
-    firstName,
-    lastName,
-    email,
-  });
+    await newUser.save();
 
-  return {
-    data: token,
-    status: 201,
-  };
+    const token = generateJwt({
+      firstName,
+      lastName,
+      email,
+    });
+
+    return {
+      data: token,
+      status: 201,
+    };
+  } catch (error) {
+    return { data: "Error registering user", status: 500 };
+  }
 };
 
 interface loginParams {
@@ -47,25 +51,30 @@ interface loginParams {
 }
 
 export const login = async ({ email, password }: loginParams) => {
-  const findedUser = await UserModel.findOne({ email });
-  if (!findedUser) return { data: "incorrect email or password", status: 400 };
+  try {
+    const findedUser = await UserModel.findOne({ email });
+    if (!findedUser)
+      return { data: "incorrect email or password", status: 400 };
 
-  const passwordMatch = await bcryot.compare(password, findedUser.password);
-  if (!passwordMatch)
-    return { data: "incorrect email or password", status: 400 };
+    const passwordMatch = await bcrypt.compare(password, findedUser.password);
+    if (!passwordMatch)
+      return { data: "incorrect email or password", status: 400 };
 
-  const token = generateJwt({
-    firstName: findedUser.firstName,
-    lastName: findedUser.lastName,
-    email: findedUser.email,
-  });
+    const token = generateJwt({
+      firstName: findedUser.firstName,
+      lastName: findedUser.lastName,
+      email: findedUser.email,
+    });
 
-  return {
-    data: token,
-    status: 200,
-  };
+    return {
+      data: token,
+      status: 200,
+    };
+  } catch (error) {
+    return { data: "Error logging in", status: 500 };
+  }
 };
 
 const generateJwt = (data: any) => {
-  return jwt.sign(data, "8b18e2a1d7f8a0b83d7265d7");
+  return jwt.sign(data, process.env.JWT_SECRET || "");
 };
