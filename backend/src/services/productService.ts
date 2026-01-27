@@ -9,66 +9,24 @@ export const seedInitialProducts = async () => {
   try {
     const initialProducts = [
       {
-        title: "Dell laptop",
-        image:
-          "https://blogs.windows.com/wp-content/uploads/sites/2/2016/09/Dell-XPS-5.jpg",
-        price: 19.99,
-        stock: 100,
-      },
-      {
-        title: "Sample Product 2",
-        image: "image2.jpg",
-        price: 29.99,
-        stock: 85,
-      },
-      {
-        title: "Sample Product 3",
-        image: "image3.jpg",
-        price: 39.99,
-        stock: 120,
-      },
-      {
-        title: "Sample Product 4",
-        image: "image4.jpg",
-        price: 49.99,
-        stock: 65,
-      },
-      {
-        title: "Sample Product 5",
-        image: "image5.jpg",
-        price: 59.99,
-        stock: 90,
-      },
-      {
-        title: "Sample Product 6",
-        image: "image6.jpg",
-        price: 69.99,
-        stock: 45,
-      },
-      {
-        title: "Sample Product 7",
-        image: "image7.jpg",
-        price: 79.99,
-        stock: 110,
-      },
-      {
-        title: "Sample Product 8",
-        image: "image8.jpg",
-        price: 89.99,
-        stock: 75,
-      },
-      {
-        title: "Sample Product 9",
-        image: "image9.jpg",
-        price: 99.99,
+        title: "Apple MacBook Air M2",
+        image: "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-air-og-202503?wid=1200&hei=630&fmt=jpeg&qlt=90&.v=1739216814915",
+        price: 999.00,
         stock: 50,
       },
       {
-        title: "Sample Product 10",
-        image: "image10.jpg",
-        price: 109.99,
-        stock: 95,
+        title: "HP Spectre x360 14",
+        image: "https://img-cdn.tnwcdn.com/image?fit=1280%2C720&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2021%2F08%2FHP-Spectre-x360-14-1-of-7.jpg&signature=b273734ba382a58d403431a960fd1708",
+        price: 1249.99,
+        stock: 32,
       },
+      {
+        title: "Lenovo ThinkPad X1 Carbon",
+        image: "https://images.hepsiburada.net/description-assets/description-prod-30/4be8d17a-b68d-43fd-86ba-6933049d5b65.jpg",
+        price: 1420.50,
+        stock: 15,
+      },
+      
     ];
 
     const products = await getAllProducts();
