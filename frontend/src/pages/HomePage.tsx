@@ -4,6 +4,7 @@ import ProductCard from "../components/ProductCard";
 import { useEffect, useState } from "react";
 import type { Product } from "../typs/product";
 import { Box } from "@mui/material";
+import { beasURL } from "../constantes/beasURL";
 
 const HomePage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -11,7 +12,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3001/products");
+        const response = await fetch(`${beasURL}/products`);
         const data = await response.json();
         setProducts(data);
       } catch {
