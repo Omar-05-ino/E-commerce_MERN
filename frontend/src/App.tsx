@@ -2,9 +2,11 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import NavBar from "./components/NavBar";
 import RegisterPage from "./pages/RegisterPage";
+import AuthProvider from "./context/Auth/AuthProvider"
+
 function App() {
   return (
-    <>
+    <AuthProvider>
       <BrowserRouter>
         <NavBar />
         <Routes>
@@ -13,7 +15,7 @@ function App() {
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </BrowserRouter>
-    </>
+    </AuthProvider>
   );
 }
 

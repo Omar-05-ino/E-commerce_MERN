@@ -2,6 +2,7 @@ import { Box, Typography, TextField, Button } from "@mui/material";
 import Container from "@mui/material/Container";
 import { useRef, useState } from "react";
 import { beasURL } from "../constantes/beasURL";
+import { useAuth } from "../context/Auth/AuthContext";
 
 const RegisterPage = () => {
   const [error, setError] = useState("");
@@ -10,6 +11,8 @@ const RegisterPage = () => {
   const lastnameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+
+  const { login } = useAuth();
 
   const fields = [
     { name: "firstname", label: "First Name", type: "text", ref: firstnameRef },
@@ -26,16 +29,25 @@ const RegisterPage = () => {
   };
 
   const handleSubmit = async () => {
+    
+    setError("");
+    setSuccess("");
     const formData = {
       firstName: firstnameRef.current?.value,
       lastName: lastnameRef.current?.value,
       email: emailRef.current?.value,
       password: passwordRef.current?.value,
     };
-
-    setError("");
-    setSuccess("");
-
+    if (
+      !formData.email ||
+      !formData.firstName ||
+      formData.lastName ||
+      formData.password
+    ) {
+      setError("Chech submitted data");
+      return;
+    }
+    
     try {
       const response = await fetch(`${beasURL}/user/register`, {
         method: "POST",
@@ -50,8 +62,13 @@ const RegisterPage = () => {
         return;
       }
 
-      const data = await response.json();
-      console.log("Success:", data);
+      const token = await response.json();
+      if (!token) {
+        setError("Incorrect token");
+        return;
+      }
+      login(formData.email, token);
+      console.log("Success:", token);
       setSuccess("Account created successfully!");
       clearForm();
     } catch (error) {
