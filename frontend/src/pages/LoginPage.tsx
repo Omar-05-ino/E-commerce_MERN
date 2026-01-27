@@ -5,11 +5,9 @@ import { beasURL } from "../constantes/beasURL";
 import { useAuth } from "../context/Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const RegisterPage = () => {
+const LoginPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const firstnameRef = useRef<HTMLInputElement>(null);
-  const lastnameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -18,38 +16,29 @@ const RegisterPage = () => {
   const { login } = useAuth();
 
   const fields = [
-    { name: "firstname", label: "First Name", type: "text", ref: firstnameRef },
-    { name: "lastname", label: "Last Name", type: "text", ref: lastnameRef },
     { name: "email", label: "Email", type: "email", ref: emailRef },
     { name: "password", label: "Password", type: "password", ref: passwordRef },
   ];
 
   const clearForm = () => {
-    firstnameRef.current!.value = "";
-    lastnameRef.current!.value = "";
     emailRef.current!.value = "";
     passwordRef.current!.value = "";
   };
 
   const handleSubmit = async () => {
-    
     setError("");
     setSuccess("");
     const formData = {
-      firstName: firstnameRef.current?.value,
-      lastName: lastnameRef.current?.value,
       email: emailRef.current?.value,
       password: passwordRef.current?.value,
     };
-    if (
-      !formData.email
-    ) {
+    if (!formData.email) {
       setError("Chech submitted data");
       return;
     }
-    
+
     try {
-      const response = await fetch(`${beasURL}/user/register`, {
+      const response = await fetch(`${beasURL}/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -68,9 +57,9 @@ const RegisterPage = () => {
         return;
       }
       login(formData.email, token);
+      navigate("/")
       console.log("Success:", token);
       setSuccess("Account created successfully!");
-      navigate("/")
       clearForm();
     } catch (error) {
       console.error("Network or parsing error:", error);
@@ -89,7 +78,7 @@ const RegisterPage = () => {
           mt: 4,
         }}
       >
-        <Typography variant="h4">Register new account</Typography>
+        <Typography variant="h4">Login to your account</Typography>
       </Box>
       <Box
         sx={{
@@ -119,7 +108,7 @@ const RegisterPage = () => {
           sx={{ maxWidth: 400, mt: 2 }}
           onClick={handleSubmit}
         >
-          Register
+          login
         </Button>
         {error && <Typography sx={{ color: "red" }}>{error}</Typography>}
         {success && <Typography sx={{ color: "green" }}>{success}</Typography>}
@@ -128,4 +117,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default LoginPage;
