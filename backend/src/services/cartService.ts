@@ -26,13 +26,15 @@ export const getActiveCartForUser = async ({
   if (populateProduct) {
     cart = await cartModel
       .findOne({ userId, status: "active" })
-      .populate("items.product");
+      .populate("items.product"); // هذا السطر هو المسؤول عن جلب تفاصيل المنتج
   } else {
     cart = await cartModel.findOne({ userId, status: "active" });
   }
 
   if (!cart) {
     cart = await creatCartForUser({ userId });
+    // إذا تم إنشاء سلة جديدة وأردنا عمل populate، لن يضر إعادة الطلب أو إرجاعها فارغة
+    // لكن السلة الجديدة فارغة أصلاً لذا لا مشكلة
   }
 
   return cart;
@@ -78,6 +80,7 @@ export const addItemToCart = async ({
 
     await cart.save();
 
+    // هنا الكود صحيح لأنه يعيد طلب السلة مع populate
     return {
       data: await getActiveCartForUser({ userId, populateProduct: true }),
       status: 200,
@@ -132,9 +135,16 @@ export const updateItemInCart = async ({
     total += existsInCart.unitPrice * existsInCart.quantity;
     cart.totalAmount = total;
 
-    const updatedCart = await cart.save();
+    await cart.save();
 
-    return { data: updatedCart, status: 200 };
+    // ----------------------------------------------------
+    // تم التعديل هنا: إعادة جلب البيانات مع populate
+    // ----------------------------------------------------
+    return { 
+        data: await getActiveCartForUser({ userId, populateProduct: true }), 
+        status: 200 
+    };
+    
   } catch (error) {
     return { data: "Error updating item in cart", status: 500 };
   }
@@ -171,7 +181,7 @@ export const deleteItemFromCart = async ({
 
     cart.totalAmount = total;
     cart.items = otherCartItems;
-    const updatedCart = await cart.save();
+    await cart.save();
 
     return {
       data: await getActiveCartForUser({ userId, populateProduct: true }),
@@ -183,70 +193,70 @@ export const deleteItemFromCart = async ({
 };
 
 interface IClearCart {
-  userId: string;
-}
-
-export const clearCart = async ({ userId }: IClearCart) => {
-  try {
-    const cart = await getActiveCartForUser({ userId });
-    cart.items = [];
-    cart.totalAmount = 0;
-    const updatedCart = await cart.save();
-    return { data: updatedCart, status: 200 };
-  } catch (error) {
-    return { data: "Error clearing cart", status: 500 };
+    userId: string;
   }
-};
-
-interface ICheckout {
-  userId: string;
-  address: string;
-}
-
-export const checkout = async ({ userId, address }: ICheckout) => {
-  try {
-    if (!address) {
-      return { data: "Address is required for checkout", status: 400 };
+  
+  export const clearCart = async ({ userId }: IClearCart) => {
+    try {
+      const cart = await getActiveCartForUser({ userId });
+      cart.items = [];
+      cart.totalAmount = 0;
+      const updatedCart = await cart.save();
+      return { data: updatedCart, status: 200 };
+    } catch (error) {
+      return { data: "Error clearing cart", status: 500 };
     }
-
-    const cart = await getActiveCartForUser({ userId });
-
-    const orderItems: IOrderItem[] = [];
-
-    for (const item of cart.items) {
-      const product = await productModel.findById(item.product);
-
-      if (!product) {
-        return {
-          data: `Product with id ${item.product} not found`,
-          status: 404,
-        };
+  };
+  
+  interface ICheckout {
+    userId: string;
+    address: string;
+  }
+  
+  export const checkout = async ({ userId, address }: ICheckout) => {
+    try {
+      if (!address) {
+        return { data: "Address is required for checkout", status: 400 };
       }
-
-      const orderItem: IOrderItem = {
-        productTitle: product.title,
-        productImage: product.image,
-        unitPrice: item.unitPrice,
-        quantity: item.quantity,
-      };
-
-      orderItems.push(orderItem);
+  
+      const cart = await getActiveCartForUser({ userId });
+  
+      const orderItems: IOrderItem[] = [];
+  
+      for (const item of cart.items) {
+        const product = await productModel.findById(item.product);
+  
+        if (!product) {
+          return {
+            data: `Product with id ${item.product} not found`,
+            status: 404,
+          };
+        }
+  
+        const orderItem: IOrderItem = {
+          productTitle: product.title,
+          productImage: product.image,
+          unitPrice: item.unitPrice,
+          quantity: item.quantity,
+        };
+  
+        orderItems.push(orderItem);
+      }
+  
+      const order = await orderModel.create({
+        orderItems,
+        totalAmount: cart.totalAmount,
+        userId,
+        address,
+      });
+  
+      await order.save();
+  
+      cart.status = "completed";
+      await cart.save();
+  
+      return { data: order, status: 200 };
+    } catch (error) {
+      return { data: "Error processing checkout", status: 500 };
     }
-
-    const order = await orderModel.create({
-      orderItems,
-      totalAmount: cart.totalAmount,
-      userId,
-      address,
-    });
-
-    await order.save();
-
-    cart.status = "completed";
-    await cart.save();
-
-    return { data: order, status: 200 };
-  } catch (error) {
-    return { data: "Error processing checkout", status: 500 };
-  }
-};
+  };

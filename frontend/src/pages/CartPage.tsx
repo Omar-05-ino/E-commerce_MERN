@@ -1,14 +1,15 @@
 import { Box, Container, Typography } from "@mui/material";
-import { useState } from "react";
 import { useCart } from "../context/Cart/CartContext";
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 
 const CartPage = () => {
-  const { cartItems ,totalAmount} = useCart();
-  const [error] = useState<string>("");
+  const { cartItems, totalAmount, upddateItemCart } = useCart();
 
-  console.log(error);
+  const handleQuantity = (productId: string, quantity: number) => {
+    if (quantity <= 0) return;
+    upddateItemCart(productId, quantity);
+  };
 
   return (
     <Container
@@ -17,8 +18,10 @@ const CartPage = () => {
       }}
       fixed
     >
-      <Typography variant="h4" mb={1}>my cart</Typography>
-      <Box display="flex" flexDirection='column'   gap={1}>
+      <Typography variant="h4" mb={1}>
+        my cart
+      </Typography>
+      <Box display="flex" flexDirection="column" gap={1}>
         {cartItems.map((item) => (
           <Box
             display="flex"
@@ -28,8 +31,8 @@ const CartPage = () => {
             sx={{
               border: 1,
               borderColor: "#f3f3f3",
-              borderRadius:5,
-              padding:2
+              borderRadius: 5,
+              padding: 2,
             }}
           >
             <Box
@@ -50,13 +53,27 @@ const CartPage = () => {
               </Box>
             </Box>
             <ButtonGroup variant="contained" aria-label="Basic button group">
-              <Button>-</Button>
-              <Button>+</Button>
+              <Button
+                onClick={() =>
+                  handleQuantity(item.productId, item.quantity - 1)
+                }
+              >
+                -
+              </Button>
+              <Button
+                onClick={() =>
+                  handleQuantity(item.productId, item.quantity + 1)
+                }
+              >
+                +
+              </Button>
             </ButtonGroup>
           </Box>
         ))}
 
-        <Box><Typography>Totla Amount : {totalAmount} $</Typography></Box>
+        <Box>
+          <Typography>Totla Amount : {totalAmount} $</Typography>
+        </Box>
       </Box>
     </Container>
   );

@@ -37,7 +37,6 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
       setCartItems([...cartItemsMapped]);
       setTotlaAmount(cart.totalAmount);
-
     };
 
     fetchCart();
@@ -66,13 +65,67 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
       if (!cart) {
         setError("failed to prase cart data");
       }
+      const cartItemsMapped = cart.items.map(
+        ({ product, quantity, unitPrice }: any) => ({
+          productId: product._id,
+          title: product.title,
+          image: product.image,
+          quantity,
+          unitPrice,
+        }),
+      );
 
+      setCartItems([...cartItemsMapped]);
+      setTotlaAmount(cart.totalAmount);
     } catch (erroe) {
       console.log(erroe);
     }
   };
+
+  const upddateItemCart = async (productId: string, quantity: number) => {
+    try {
+      const respons = await fetch(`${beasURL}/cart/items`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId,
+          quantity,
+        }),
+      });
+
+      if (!respons.ok) {
+        setError("failed to update to cart");
+      }
+
+      const cart = await respons.json();
+
+      if (!cart) {
+        setError("failed to prase cart data");
+      }
+      const cartItemsMapped = cart.items.map(
+        ({ product, quantity, unitPrice }: any) => ({
+          productId: product._id,
+          title: product.title,
+          image: product.image,
+          quantity,
+          unitPrice,
+        }),
+      );
+
+      setCartItems([...cartItemsMapped]);
+      setTotlaAmount(cart.totalAmount);
+    } catch (erroe) {
+      console.log(erroe);
+    }
+  };
+
   return (
-    <CartContext.Provider value={{ cartItems, totalAmount, addItemToCart }}>
+    <CartContext.Provider
+      value={{ cartItems, totalAmount, addItemToCart, upddateItemCart }}
+    >
       {children}
     </CartContext.Provider>
   );
