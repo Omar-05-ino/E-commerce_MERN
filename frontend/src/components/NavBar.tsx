@@ -14,10 +14,12 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAuth } from "../context/Auth/AuthContext";
 import { Badge, Button, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../context/Cart/CartContext";
 
 function NavBar() {
   const navigate = useNavigate();
 
+  const { cartItems } = useCart();
   const { username, isAuthenticated, logout } = useAuth();
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null,
@@ -58,22 +60,28 @@ function NavBar() {
               width: "100%",
             }}
           >
-            <Box sx={{ display: "flex", flexDirection: "row" }}>
-              <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
-              <Typography
-                variant="h6"
-                noWrap
-                component="a"
-                sx={{
-                  mr: 2,
-                  display: { xs: "none", md: "flex" },
-                  fontFamily: "monospace",
-                  fontWeight: 700,
-                }}
-              >
-                TECH HUP
-              </Typography>
-            </Box>
+            <Button
+              variant="text"
+              sx={{ color: "#fff" }}
+              onClick={() => navigate("/")}
+            >
+              <Box sx={{ display: "flex", flexDirection: "row" }}>
+                <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="a"
+                  sx={{
+                    mr: 2,
+                    display: { xs: "none", md: "flex" },
+                    fontFamily: "monospace",
+                    fontWeight: 700,
+                  }}
+                >
+                  TECH HUP
+                </Typography>
+              </Box>
+            </Button>
             <Box
               gap={2}
               flexDirection="row"
@@ -83,7 +91,7 @@ function NavBar() {
             >
               {isAuthenticated ? (
                 <IconButton aria-label="cart" onClick={handleCart}>
-                  <Badge badgeContent={1} color="secondary">
+                  <Badge badgeContent={cartItems.length} color="secondary">
                     <ShoppingCartIcon sx={{ color: "#ffffff" }} />
                   </Badge>
                 </IconButton>

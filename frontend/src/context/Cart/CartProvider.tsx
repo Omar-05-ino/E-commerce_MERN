@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type FC, type PropsWithChildren, useState } from "react";
+import { type FC, type PropsWithChildren, useEffect, useState } from "react";
 import { CartContext } from "./CartContext";
 import type { CartItem } from "../../typs/CartItem";
 import { beasURL } from "../../constantes/beasURL";
@@ -11,13 +11,41 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
   const [totalAmount, setTotlaAmount] = useState<number>(0);
   const [error, setError] = useState<string>();
   console.log(error);
+
+  useEffect(() => {
+    if (!token) return;
+    const fetchCart = async () => {
+      const respons = await fetch(`${beasURL}/cart`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!respons.ok) {
+        setError("failed to fetch a user cart");
+      }
+
+      const cart = await respons.json();
+      const cartItemsMapped = cart.items.map(({ product, quantity }: any) => ({
+        productId: product._id,
+        title: product.title,
+        image: product.image,
+        quantity,
+        unitPrice: product.unitPrice,
+      }));
+
+      setCartItems([...cartItemsMapped]);
+    };
+
+    fetchCart();
+  },[token]);
+
   const addItemToCart = async (productId: string) => {
     try {
       const respons = await fetch(`${beasURL}/cart/items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization" :`Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           productId,
@@ -35,14 +63,6 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         setError("failed to prase cart data");
       }
 
-      const cartItemsMapped = cart.items.map(({ product, quantity }: any) => ({
-        productId: product._id,
-        title: product.title,
-        image: product.image,
-        quantity,
-        unitPrice: product.unitPrice,
-      }));
-      setCartItems([...cartItemsMapped]);
       setTotlaAmount(cart.totalAmount);
     } catch (erroe) {
       console.log(erroe);
