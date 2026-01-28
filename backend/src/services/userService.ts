@@ -1,6 +1,7 @@
 import UserModel from "../models/userModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { orderModel } from "../models/orderModel";
 
 interface RegisterParams {
   firstName: string;
@@ -72,6 +73,20 @@ export const login = async ({ email, password }: loginParams) => {
     };
   } catch (error) {
     return { data: "Error logging in", status: 500 };
+  }
+};
+
+interface getMyOrdersParams {
+  userId: string;
+}
+
+export const getMyOrders = async ({ userId }: getMyOrdersParams) => {
+  try {
+    const orders = await orderModel.find({ userId });
+
+    return { data: orders, status: 200 };
+  } catch (err) {
+    throw { data: "Error fetching orders", status: 500 };
   }
 };
 
