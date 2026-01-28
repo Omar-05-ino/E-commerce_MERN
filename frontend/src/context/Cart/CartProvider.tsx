@@ -157,6 +157,32 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+  const clearCart = async () => {
+    try {
+      const respons = await fetch(`${beasURL}/cart`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+      });
+
+      if (!respons.ok) {
+        setError("failed to delete to cart");
+      }
+
+      const cart = await respons.json();
+
+      if (cart) {
+        setError("failed to prase cart data");
+      }
+
+      setCartItems([]);
+      setTotlaAmount(0);
+    } catch (erroe) {
+      console.log(erroe);
+    }
+  }
   return (
     <CartContext.Provider
       value={{
@@ -165,6 +191,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         addItemToCart,
         upddateItemCart,
         RemovItemFromCart,
+        clearCart
       }}
     >
       {children}
