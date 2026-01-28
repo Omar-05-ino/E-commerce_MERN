@@ -4,11 +4,16 @@ import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 
 const CartPage = () => {
-  const { cartItems, totalAmount, upddateItemCart } = useCart();
+  const { cartItems, totalAmount, upddateItemCart, RemovItemFromCart } =
+    useCart();
 
   const handleQuantity = (productId: string, quantity: number) => {
     if (quantity <= 0) return;
     upddateItemCart(productId, quantity);
+  };
+
+  const handleRemovItem = (productId: string) => {
+    RemovItemFromCart(productId);
   };
 
   return (
@@ -49,7 +54,9 @@ const CartPage = () => {
                   {" "}
                   {item.quantity} X {item.unitPrice} $
                 </Typography>
-                <Button>Remov</Button>
+                <Button onClick={() => handleRemovItem(item.productId)}>
+                  Remov
+                </Button>
               </Box>
             </Box>
             <ButtonGroup variant="contained" aria-label="Basic button group">
