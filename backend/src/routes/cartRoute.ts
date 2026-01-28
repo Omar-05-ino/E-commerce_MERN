@@ -15,7 +15,7 @@ const router = express.Router();
 router.get("/", valaidataJwt, async (req: extendedRequest, res) => {
   try {
     const userId = req.user._id;
-    const cart = await getActiveCartForUser({ userId });
+    const cart = await getActiveCartForUser({ userId, populateProduct: true });
     res.status(200).send(cart);
   } catch (error) {
     res.status(500).send({ data: "Internal Server Error" });

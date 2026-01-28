@@ -14,12 +14,22 @@ const creatCartForUser = async ({ userId }: ICreatCartForUser) => {
 
 interface IGetActiveCartForUser {
   userId: string;
+  populateProduct?: boolean;
 }
 
 export const getActiveCartForUser = async ({
   userId,
+  populateProduct,
 }: IGetActiveCartForUser) => {
-  let cart = await cartModel.findOne({ userId, status: "active" });
+  let cart;
+
+  if (populateProduct) {
+    cart = await cartModel
+      .findOne({ userId, status: "active" })
+      .populate("items.product");
+  } else {
+    cart = await cartModel.findOne({ userId, status: "active" });
+  }
 
   if (!cart) {
     cart = await creatCartForUser({ userId });
@@ -66,9 +76,12 @@ export const addItemToCart = async ({
 
     cart.totalAmount += product.price * quantity;
 
-    const updatedCart = await cart.save();
+    await cart.save();
 
-    return { data: updatedCart, status: 200 };
+    return {
+      data: await getActiveCartForUser({ userId, populateProduct: true }),
+      status: 200,
+    };
   } catch (error) {
     return { data: "Error adding item to cart", status: 500 };
   }
@@ -160,7 +173,10 @@ export const deleteItemFromCart = async ({
     cart.items = otherCartItems;
     const updatedCart = await cart.save();
 
-    return { data: updatedCart, status: 200 };
+    return {
+      data: await getActiveCartForUser({ userId, populateProduct: true }),
+      status: 200,
+    };
   } catch (error) {
     return { data: "Error deleting item from cart", status: 500 };
   }
