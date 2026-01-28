@@ -25,19 +25,23 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
       }
 
       const cart = await respons.json();
-      const cartItemsMapped = cart.items.map(({ product, quantity }: any) => ({
-        productId: product._id,
-        title: product.title,
-        image: product.image,
-        quantity,
-        unitPrice: product.unitPrice,
-      }));
+      const cartItemsMapped = cart.items.map(
+        ({ product, quantity, unitPrice }: any) => ({
+          productId: product._id,
+          title: product.title,
+          image: product.image,
+          quantity,
+          unitPrice,
+        }),
+      );
 
       setCartItems([...cartItemsMapped]);
+      setTotlaAmount(cart.totalAmount);
+
     };
 
     fetchCart();
-  },[token]);
+  }, [token]);
 
   const addItemToCart = async (productId: string) => {
     try {
@@ -63,7 +67,6 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         setError("failed to prase cart data");
       }
 
-      setTotlaAmount(cart.totalAmount);
     } catch (erroe) {
       console.log(erroe);
     }
